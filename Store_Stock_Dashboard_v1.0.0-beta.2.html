@@ -85,7 +85,7 @@
 
                         let inStock = row["Stock Status"] === "Red" ? "No" : "Yes";
 
-                        let onOrderGraphic = row["On Order"] === "True"
+                        let onOrderGraphic = (row["On Order"] || "").toString().toLowerCase() === "true"
                             ? '<img src="https://cdn-icons-png.flaticon.com/512/107/107831.png" class="on-order-icon" alt="On order">'
                             : "";
 
