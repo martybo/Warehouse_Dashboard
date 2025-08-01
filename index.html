@@ -64,7 +64,7 @@
                             <td>${row["Stock Level"] || ""}</td>
                             <td>${row["Weeks of Stock (supplied)"] || ""}</td>
                             <td>${row["Stock Status"] || ""}</td>
-                            <td>${row["On Order"] === "True" ? "<span class='on-order'>Yes</span>" : "No"}</td>
+                            <td>${(row["On Order"] || "").toString().toLowerCase() === "true" ? "<span class='on-order'>Yes</span>" : "No"}</td>
                             <td>${row["binLocation"] || ""}</td>
                         `;
                         tbody.appendChild(tr);
