@@ -117,6 +117,8 @@
                         `;
                         tbody.appendChild(tr);
                     });
+                    // Hide rows until user searches
+                    filterTable();
                 }
             });
         }
@@ -128,7 +130,7 @@
 
             trs.forEach(tr => {
                 const text = tr.textContent.toLowerCase();
-                tr.style.display = text.includes(filter) ? "" : "none";
+                tr.style.display = filter && text.includes(filter) ? "" : "none";
             });
         }
 
