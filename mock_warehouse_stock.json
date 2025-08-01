@@ -1,0 +1,26 @@
+[
+  {
+    "Product Name": "LOREAL AGE PERFECT GOLDEN AGE REACT COOL CREAM - NIGHT",
+    "Pack": "50ML",
+    "Code": "8703241",
+    "barcode1": "3600523242641",
+    "Stock Status": "Green",
+    "On Order": "FALSE"
+  },
+  {
+    "Product Name": "1 MILLION DEO STICK 75ML",
+    "Pack": "75ML",
+    "Code": "8716730",
+    "barcode1": "3349666007990",
+    "Stock Status": "Red",
+    "On Order": "FALSE"
+  },
+  {
+    "Product Name": "PASSPORT SONY UPC-X34PF (30)",
+    "Pack": "",
+    "Code": "6585061",
+    "barcode1": "4582287830878",
+    "Stock Status": "Amber",
+    "On Order": "TRUE"
+  }
+]

@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CSV to JSON Uploader</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        h2 { margin-top: 0; }
+        input[type="file"] { margin: 10px 0 20px 0; }
+        pre { background: #fff; border: 1px solid #ccc; padding: 10px; overflow: auto; max-height: 400px; }
+        .download-link { margin-top: 20px; display: block; }
+    </style>
+</head>
+<body>
+    <h2>CSV to JSON Uploader</h2>
+    <p>Upload your exported warehouse CSV file. This tool will convert it to JSON format ready for the dashboard.</p>
+    <input type="file" id="csvFile" accept=".csv" />
+    <button onclick="convertCSV()">Convert</button>
+
+    <h3>Preview (JSON):</h3>
+    <pre id="jsonOutput"></pre>
+    <a id="downloadLink" class="download-link" href="#" style="display:none;" download="warehouse_stock.json">Download JSON</a>
+
+    <script>
+        function convertCSV() {
+            const fileInput = document.getElementById("csvFile");
+            if (!fileInput.files.length) return alert("Please select a CSV file first.");
+
+            Papa.parse(fileInput.files[0], {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    const data = results.data.map(row => {
+                        return {
+                            "Product Name": row["Product Name"]?.trim() || "",
+                            "Pack": row["Pack"]?.trim() || "",
+                            "Code": row["Code"]?.trim() || "",
+                            "barcode1": row["barcode1"]?.trim() || "",
+                            "Stock Status": row["Stock Status"]?.trim() || "",
+                            "On Order": row["On Order"]?.trim() || ""
+                        };
+                    });
+
+                    const jsonString = JSON.stringify(data, null, 2);
+                    document.getElementById("jsonOutput").textContent = jsonString;
+
+                    const blob = new Blob([jsonString], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.getElementById("downloadLink");
+                    link.href = url;
+                    link.style.display = "block";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
