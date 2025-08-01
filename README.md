@@ -1,19 +1,29 @@
 # Warehouse Stock Availability Dashboard
 
-A lightweight, browser-based dashboard that enables store teams to check warehouse stock availability with simple, visual indicators.
+A lightweight, browser-based stock status viewer for pharmacy store teams.
 
 This project is designed to support **read-only, real-time updates** using a public GitHub-hosted `.csv` file, making it ideal for SharePoint embedding, kiosk use, or desktop reference.
 
 ---
 
-## ✅ Key Features
+## 🌟 Features
+- Real-time CSV parsing from GitHub
+- Color-coded stock indicators (Green, Amber, Red)
+- "On Order" icon displayed as 🚚
+- Search by product name, PIP code, or barcode
+- Mobile and desktop friendly
+- Auto-updating date + semantic versioning
 
-- 🔍 **Live search** by Product Name, Code, or Barcode
-- 🟢🟡🔴 **Visual stock status** using coloured indicator icons
-- 🚚 **On Order icon** shown if stock is expected
-- 🧾 CSV-driven data (auto-parsed with [PapaParse](https://www.papaparse.com/))
-- 📄 **No database or login required**
-- 🌐 Designed to be embedded in SharePoint or hosted via GitHub Pages
+---
+
+## 🚀 Live Demo
+[View the Dashboard](https://martybo.github.io/Warehouse_Dashboard/)
+
+---
+
+## 📦 Version
+**v1.0.0** — Initial public release  
+_Deployed: 01-08-2025_
 
 ---
 
