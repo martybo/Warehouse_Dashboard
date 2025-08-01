@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Store Stock Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header img { height: 60px; }
+        .updated-date { font-size: 14px; color: #666; }
+        table { border-collapse: collapse; width: 100%; background: white; }
+        th, td { padding: 10px 12px; border: 1px solid #ccc; text-align: left; }
+        th { background-color: #f0f0f0; }
+        .status-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .green-circle { background-color: #28a745; }
+        .amber-circle { background-color: #ffc107; }
+        .red-circle { background-color: #dc3545; }
+        .on-order-icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Pharmacy_Green_Cross.svg/1200px-Pharmacy_Green_Cross.svg.png" alt="Business Logo">
+        <div class="updated-date" id="updatedDate">Last updated: --</div>
+    </div>
+
+    <h2>Store Stock Availability Dashboard</h2>
+    <input type="text" id="search" placeholder="Search by Product Name, Code or Barcode" onkeyup="filterTable()" />
+
+    <table id="stockTable">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>In Stock</th>
+                <th>Product Name</th>
+                <th>Pack</th>
+                <th>Code</th>
+                <th>Barcode</th>
+                <th>On Order</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const CSV_URL = "https://raw.githubusercontent.com/martybo/Warehouse_Dashboard/main/StockDashboardData.csv";
+
+        function loadCSV() {
+            Papa.parse(CSV_URL, {
+                download: true,
+                header: true,
+                complete: function(results, file) {
+                    const tbody = document.querySelector("#stockTable tbody");
+                    results.data.forEach(row => {
+                        let tr = document.createElement("tr");
+
+                        let stockStatus = row["Stock Status"];
+                        let statusIcon = "";
+                        if (stockStatus === "Green")
+                            statusIcon = '<span class="status-icon green-circle"></span>';
+                        else if (stockStatus === "Amber")
+                            statusIcon = '<span class="status-icon amber-circle"></span>';
+                        else if (stockStatus === "Red")
+                            statusIcon = '<span class="status-icon red-circle"></span>';
+
+                        let inStock = row["Stock Status"] === "Red" ? "No" : "Yes";
+
+                        let onOrderGraphic = row["On Order"] === "True"
+                            ? '<img src="https://cdn-icons-png.flaticon.com/512/107/107831.png" class="on-order-icon" alt="On order">'
+                            : "";
+
+                        tr.innerHTML = `
+                            <td>${statusIcon}</td>
+                            <td>${inStock}</td>
+                            <td>${row["Product Name"] || ""}</td>
+                            <td>${row["Pack"] || ""}</td>
+                            <td>${row["Code"] || ""}</td>
+                            <td>${row["barcode1"] || ""}</td>
+                            <td>${onOrderGraphic}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    const today = new Date();
+                    const formatted = today.toLocaleDateString('en-GB');
+                    document.getElementById("updatedDate").textContent = "Last updated: " + formatted;
+                }
+            });
+        }
+
+        function filterTable() {
+            let input = document.getElementById("search");
+            let filter = input.value.toLowerCase();
+            let table = document.getElementById("stockTable");
+            let trs = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < trs.length; i++) {
+                let rowText = trs[i].textContent.toLowerCase();
+                trs[i].style.display = rowText.includes(filter) ? "" : "none";
+            }
+        }
+
+        loadCSV();
+    </script>
+</body>
+</html>
