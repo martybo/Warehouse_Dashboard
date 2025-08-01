@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Warehouse Stock Availability Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header img { height: 60px; }
+        .updated-date { font-size: 14px; color: #666; }
+        table { border-collapse: collapse; width: 100%; background: white; margin-top: 15px; }
+        th, td { padding: 10px 12px; border: 1px solid #ccc; text-align: left; }
+        th { background-color: #f0f0f0; }
+        .status-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .green-circle { background-color: #28a745; }
+        .amber-circle { background-color: #ffc107; }
+        .red-circle { background-color: #dc3545; }
+        .on-order-icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .hint {
+            font-size: 14px;
+            color: #777;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+        footer {
+            margin-top: 40px;
+            font-size: 13px;
+            text-align: center;
+            color: #555;
+        }
+        hr { margin: 30px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="logo.jpg" alt="MediCare Logo">
+        <div class="updated-date" id="updatedDate">Last updated: --</div>
+    </div>
+
+    <h2>Warehouse Stock Availability Dashboard</h2>
+    <input type="text" id="search" placeholder="Search by Product Name, Code or Barcode" onkeyup="filterTable()" />
+    <div class="hint">Search results will filter as you type.</div>
+
+    <table id="stockTable">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Pack</th>
+                <th>Code</th>
+                <th>Barcode</th>
+                <th>Status</th>
+                <th>On Order</th>
+            </tr>
+        </thead>
+        <tbody id="stockBody"></tbody>
+    </table>
+
+    <footer>
+        <hr>
+        <div>Version v1.0.0-rc5 | Deployed: <span id="deployDate">--</span></div>
+    </footer>
+
+    <script>
+        const CSV_URL = "https://raw.githubusercontent.com/martybo/Warehouse_Dashboard/main/StockDashboardData.csv";
+
+        function loadCSV() {
+            Papa.parse(CSV_URL, {
+                download: true,
+                header: true,
+                transformHeader: h => h.trim(),
+                complete: function(results) {
+                    const data = results.data;
+                    const tbody = document.getElementById("stockBody");
+                    document.getElementById("updatedDate").textContent =
+                        "Last updated: " + new Date().toLocaleDateString('en-GB');
+                    document.getElementById("deployDate").textContent =
+                        new Date().toLocaleDateString('en-GB');
+
+                    data.forEach(row => {
+                        const tr = document.createElement("tr");
+
+                        let statusIcon = "";
+                        if (row["Stock Status"] === "Green") statusIcon = '<span class="status-icon green-circle"></span>';
+                        else if (row["Stock Status"] === "Amber") statusIcon = '<span class="status-icon amber-circle"></span>';
+                        else if (row["Stock Status"] === "Red") statusIcon = '<span class="status-icon red-circle"></span>';
+
+                        let onOrderGraphic = (row["On Order"] || "").toString().toLowerCase() === "true"
+                            ? '🚚'
+                            : "";
+
+                        tr.innerHTML = `
+                            <td>${row["Product Name"] || ""}</td>
+                            <td>${row["Pack"] || ""}</td>
+                            <td>${row["Code"] || ""}</td>
+                            <td>${row["barcode1"] || ""}</td>
+                            <td>${statusIcon}</td>
+                            <td>${onOrderGraphic}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            });
+        }
+
+        function filterTable() {
+            const input = document.getElementById("search");
+            const filter = input.value.trim().toLowerCase();
+            const trs = document.querySelectorAll("#stockTable tbody tr");
+
+            trs.forEach(tr => {
+                const text = tr.textContent.toLowerCase();
+                tr.style.display = text.includes(filter) ? "" : "none";
+            });
+        }
+
+        loadCSV();
+    </script>
+</body>
+</html>
