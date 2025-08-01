@@ -4,6 +4,16 @@ All notable changes to this project are documented here, using [Semantic Version
 
 ---
 
+### v1.0.0 (Public Release)
+- First production release
+- Includes:
+  - Delivery van emoji for "On Order"
+  - Refined search with row hiding until 3+ characters
+  - Last updated & deployed date display
+  - Responsive layout and barcode display improvements
+
+---
+
 ## [1.0.0-rc3] - 2025-08-01
 ### Fixed
 - Reverted to full row rendering on page load
