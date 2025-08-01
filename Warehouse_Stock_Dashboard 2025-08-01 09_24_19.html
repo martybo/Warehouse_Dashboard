@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Warehouse Stock Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+        table { border-collapse: collapse; width: 100%; background: white; }
+        th, td { padding: 8px 12px; border: 1px solid #ccc; text-align: left; }
+        th { background-color: #eee; }
+        tr.green { background-color: #d4edda; }
+        tr.amber { background-color: #fff3cd; }
+        tr.red { background-color: #f8d7da; }
+        input[type="text"] { padding: 8px; width: 100%; margin-bottom: 10px; }
+        .on-order { font-weight: bold; color: #0078d4; }
+    </style>
+</head>
+<body>
+    <h2>Warehouse Stock Status Dashboard</h2>
+    <input type="text" id="search" placeholder="Search by Product Name, Code or Barcode" onkeyup="filterTable()" />
+
+    <table id="stockTable">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Pack</th>
+                <th>Code</th>
+                <th>Barcode</th>
+                <th>Stock Level</th>
+                <th>Weeks of Stock</th>
+                <th>Status</th>
+                <th>On Order</th>
+                <th>Bin Location</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const CSV_URL = "https://medicarepharmacygroup.sharepoint.com/:x:/r/sites/PharmaceuticalProcurement/_layouts/15/Doc.aspx?sourcedoc=%7B3464BDAE-AA36-47DD-A920-98A31A26AC48%7D&file=SharePoint_StockDashboardData.csv";
+
+        function loadCSV() {
+            Papa.parse(CSV_URL, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    const tbody = document.querySelector("#stockTable tbody");
+                    results.data.forEach(row => {
+                        let tr = document.createElement("tr");
+
+                        let statusClass = "";
+                        if (row["Stock Status"] === "Green") statusClass = "green";
+                        else if (row["Stock Status"] === "Amber") statusClass = "amber";
+                        else if (row["Stock Status"] === "Red") statusClass = "red";
+
+                        tr.className = statusClass;
+                        tr.innerHTML = `
+                            <td>${row["Product Name"] || ""}</td>
+                            <td>${row["Pack"] || ""}</td>
+                            <td>${row["Code"] || ""}</td>
+                            <td>${row["barcode1"] || ""}</td>
+                            <td>${row["Stock Level"] || ""}</td>
+                            <td>${row["Weeks of Stock (supplied)"] || ""}</td>
+                            <td>${row["Stock Status"] || ""}</td>
+                            <td>${row["On Order"] === "True" ? "<span class='on-order'>Yes</span>" : "No"}</td>
+                            <td>${row["binLocation"] || ""}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            });
+        }
+
+        function filterTable() {
+            let input = document.getElementById("search");
+            let filter = input.value.toLowerCase();
+            let table = document.getElementById("stockTable");
+            let trs = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < trs.length; i++) {
+                let rowText = trs[i].textContent.toLowerCase();
+                trs[i].style.display = rowText.includes(filter) ? "" : "none";
+            }
+        }
+
+        loadCSV();
+    </script>
+</body>
+</html>
