@@ -22,11 +22,6 @@
         .green-circle { background-color: #28a745; }
         .amber-circle { background-color: #ffc107; }
         .red-circle { background-color: #dc3545; }
-        .on-order-icon {
-            width: 20px;
-            height: 20px;
-            vertical-align: middle;
-        }
         input[type="text"] {
             padding: 10px;
             width: 100%;
@@ -58,7 +53,7 @@
 
     <h2>Warehouse Stock Availability Dashboard</h2>
     <input type="text" id="search" placeholder="Search by Product Name, Code or Barcode" onkeyup="filterTable()" />
-    <div class="hint">Search results will filter as you type.</div>
+    <div class="hint">Enter at least 3 characters. Use / to combine search terms (e.g. levoth/tab/50)</div>
 
     <table id="stockTable">
         <thead>
@@ -76,7 +71,7 @@
 
     <footer>
         <hr>
-        <div>Version v1.0.0 | Deployed: <span id="deployDate">--</span></div>
+        <div>Version v1.0.1 | Deployed: 03-08-2025</div>
     </footer>
 
     <script>
@@ -90,10 +85,6 @@
                 complete: function(results) {
                     const data = results.data;
                     const tbody = document.getElementById("stockBody");
-                    document.getElementById("updatedDate").textContent =
-                        "Last updated: " + new Date().toLocaleDateString('en-GB');
-                    document.getElementById("deployDate").textContent =
-                        new Date().toLocaleDateString('en-GB');
 
                     data.forEach(row => {
                         const tr = document.createElement("tr");
@@ -103,9 +94,7 @@
                         else if (row["Stock Status"] === "Amber") statusIcon = '<span class="status-icon amber-circle"></span>';
                         else if (row["Stock Status"] === "Red") statusIcon = '<span class="status-icon red-circle"></span>';
 
-                        let onOrderGraphic = (row["On Order"] || "").toString().toLowerCase() === "true"
-                            ? '🚚'
-                            : "";
+                        let onOrderIcon = (row["On Order"] || "").toString().toLowerCase() === "true" ? "🚚" : "";
 
                         tr.innerHTML = `
                             <td>${row["Product Name"] || ""}</td>
@@ -113,27 +102,47 @@
                             <td>${row["Code"] || ""}</td>
                             <td>${row["barcode1"] || ""}</td>
                             <td>${statusIcon}</td>
-                            <td>${onOrderGraphic}</td>
+                            <td>${onOrderIcon}</td>
                         `;
                         tbody.appendChild(tr);
                     });
-                    // Hide rows until user searches
+
                     filterTable();
                 }
             });
         }
 
+        function fetchLastUpdatedDate() {
+            fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.csv&per_page=1")
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        const date = new Date(data[0].commit.committer.date);
+                        document.getElementById("updatedDate").textContent =
+                            "Last updated: " + date.toLocaleDateString("en-GB");
+                    } else {
+                        throw new Error("No commit data returned");
+                    }
+                })
+                .catch(() => {
+                    document.getElementById("updatedDate").textContent = "Last updated: unknown";
+                });
+        }
+
         function filterTable() {
             const input = document.getElementById("search");
             const filter = input.value.trim().toLowerCase();
+            const segments = filter.split("/").map(s => s.trim()).filter(Boolean);
             const trs = document.querySelectorAll("#stockTable tbody tr");
 
             trs.forEach(tr => {
                 const text = tr.textContent.toLowerCase();
-                tr.style.display = filter && text.includes(filter) ? "" : "none";
+                const match = segments.length >= 1 && segments.every(seg => text.includes(seg));
+                tr.style.display = (filter.length >= 3 && match) ? "" : "none";
             });
         }
 
+        fetchLastUpdatedDate();
         loadCSV();
     </script>
 </body>
