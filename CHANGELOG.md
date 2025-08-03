@@ -1,6 +1,22 @@
 # Changelog
 
-All notable changes to this project are documented here, using [Semantic Versioning 2.0.0](https://semver.org/).
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [1.0.1] - 2025-08-03
+### Added
+- GitHub API integration to dynamically display the **Last Updated** date of the `StockDashboardData.json` file based on latest commit timestamp
+- Refined search input handling:
+  - Search is only activated when **3 or more characters** are entered
+  - Input is split by `/` for **compound search filtering** (e.g., `levoth/tab/50`)
+- Explanatory hint text below search bar
+
+### Changed
+- Hardcoded **Deployed** date shown in footer as `03-08-2025` (previously showed current local date)
 
 ---
 
