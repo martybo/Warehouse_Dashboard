@@ -2,7 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Warehouse Stock Availability Dashboard (Live Mock)</title>
+    <title>Warehouse Stock Availability Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -50,9 +51,9 @@
         <div class="updated-date" id="updatedDate">Last updated: --</div>
     </div>
 
-    <h2>Warehouse Stock Availability Dashboard (Live Mock)</h2>
+    <h2>Warehouse Stock Availability Dashboard</h2>
     <input type="text" id="search" placeholder="Search by Product Name, Code or Barcode" onkeyup="filterTable()" />
-    <div class="hint">Live data simulated from JSON. Results filter as you type.</div>
+    <div class="hint">Enter at least 3 characters. Use / to combine search terms (e.g. levoth/tab/50)</div>
 
     <table id="stockTable">
         <thead>
@@ -70,21 +71,20 @@
 
     <footer>
         <hr>
-        <div>Version v1.1.0 (Live Mock) | Deployed: <span id="deployDate">--</span></div>
+        <div>Version v1.0.1 | Deployed: 03-08-2025</div>
     </footer>
 
     <script>
-        const JSON_URL = "mock_warehouse_stock.json";
+        const CSV_URL = "https://raw.githubusercontent.com/martybo/Warehouse_Dashboard/main/StockDashboardData.csv";
 
-        function loadData() {
-            fetch(JSON_URL)
-                .then(res => res.json())
-                .then(data => {
+        function loadCSV() {
+            Papa.parse(CSV_URL, {
+                download: true,
+                header: true,
+                transformHeader: h => h.trim(),
+                complete: function(results) {
+                    const data = results.data;
                     const tbody = document.getElementById("stockBody");
-                    document.getElementById("updatedDate").textContent =
-                        "Last updated: " + new Date().toLocaleDateString('en-GB');
-                    document.getElementById("deployDate").textContent =
-                        new Date().toLocaleDateString('en-GB');
 
                     data.forEach(row => {
                         const tr = document.createElement("tr");
@@ -106,21 +106,44 @@
                         `;
                         tbody.appendChild(tr);
                     });
+
+                    filterTable();
+                }
+            });
+        }
+
+        function fetchLastUpdatedDate() {
+            fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.csv&per_page=1")
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        const date = new Date(data[0].commit.committer.date);
+                        document.getElementById("updatedDate").textContent =
+                            "Last updated: " + date.toLocaleDateString("en-GB");
+                    } else {
+                        throw new Error("No commit data returned");
+                    }
+                })
+                .catch(() => {
+                    document.getElementById("updatedDate").textContent = "Last updated: unknown";
                 });
         }
 
         function filterTable() {
             const input = document.getElementById("search");
             const filter = input.value.trim().toLowerCase();
+            const segments = filter.split("/").map(s => s.trim()).filter(Boolean);
             const trs = document.querySelectorAll("#stockTable tbody tr");
 
             trs.forEach(tr => {
                 const text = tr.textContent.toLowerCase();
-                tr.style.display = filter && text.includes(filter) ? "" : "none";
+                const match = segments.length >= 1 && segments.every(seg => text.includes(seg));
+                tr.style.display = (filter.length >= 3 && match) ? "" : "none";
             });
         }
 
-        loadData();
+        fetchLastUpdatedDate();
+        loadCSV();
     </script>
 </body>
 </html>
