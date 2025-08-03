@@ -113,8 +113,8 @@
         }
 
         function fetchLastUpdatedDate() {
-            fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.json&per_page=1")
-                .then(res => res.json())
+            fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.csv&per_page=1")
+                .then(res => res.csv())
                 .then(data => {
                     const date = new Date(data[0].commit.committer.date);
                     document.getElementById("updatedDate").textContent =
