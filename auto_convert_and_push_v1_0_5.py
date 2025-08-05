@@ -50,7 +50,7 @@ barcode_df = barcode_df.applymap(lambda x: x.strip() if isinstance(x, str) else 
 print("Merging on 'Code'...")
 merged_df = pd.merge(stock_df, barcode_df, how="left", on="Code")
 
-# Format dashboard output
+# Format JSON output
 print("Formatting dashboard output...")
 output_df = pd.DataFrame({
     "Product Name": merged_df.get("Product Name", ""),
@@ -58,20 +58,21 @@ output_df = pd.DataFrame({
     "Code": merged_df.get("Code", ""),
     "barcode1": merged_df.get("barcode1", ""),
     "Stock Status": merged_df.get("Stock Status", ""),
-    "On Order": merged_df.get("On Order", "").apply(lambda x: str(x).strip().lower()),
+    "On Order": merged_df.get("On Order", "").apply(lambda x: str(x).strip().lower() if pd.notna(x) else ""),
     "Last Updated": date.today().isoformat()
 })
 
-# Final cleanup: force all cells to string and replace unwanted 'nan' values
-output_df = output_df.astype(str).replace(
-    to_replace=["nan", "NaN", "None", "<NA>"], value="", regex=False
-).fillna("")
+
+# Fully clean up the DataFrame before JSON conversion
+output_df = output_df.replace([pd.NA, pd.NaT, None, float('nan')], "", regex=False)
+output_df = output_df.fillna("")  # fill remaining NaNs
+output_df = output_df.astype(str)  # convert all to strings
 
 # Optional debug check:
 # print(output_df.head(10).to_dict())
 
-# Convert to JSON
-json_data = json.loads(output_df.to_json(orient="records", force_ascii=False))
+# Convert to JSON (no NaN will leak at this point)
+json_data = output_df.to_dict(orient="records")
 
 # Save to local file
 print(f"Saving JSON: {output_json}")
