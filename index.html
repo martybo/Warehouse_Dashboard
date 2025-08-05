@@ -76,7 +76,7 @@
     <script>
 const DATA_URL = "https://raw.githubusercontent.com/martybo/Warehouse_Dashboard/main/StockDashboardData.json";
 
-        function loadJSON() {
+function loadJSON() {
     fetch(DATA_URL)
         .then(res => {
             if (!res.ok) throw new Error("Failed to fetch data");
@@ -84,38 +84,44 @@ const DATA_URL = "https://raw.githubusercontent.com/martybo/Warehouse_Dashboard/
         })
         .then(data => {
             if (!Array.isArray(data)) throw new Error("Data is not an array");
-            // ...populate table
+
+            const tbody = document.getElementById("stockBody");
+            tbody.innerHTML = ""; // Clear previous table contents
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6">No stock data available.</td></tr>`;
+                return;
+            }
+
+            data.forEach(row => {
+                const tr = document.createElement("tr");
+
+                let statusIcon = "";
+                if (row["Stock Status"] === "Green") statusIcon = '<span class="status-icon green-circle"></span>';
+                else if (row["Stock Status"] === "Amber") statusIcon = '<span class="status-icon amber-circle"></span>';
+                else if (row["Stock Status"] === "Red") statusIcon = '<span class="status-icon red-circle"></span>';
+
+                const onOrderValue = parseInt(row["On Order"], 10);
+                let onOrderIcon = (!isNaN(onOrderValue) && onOrderValue > 0) ? "🚚" : "";
+
+                tr.innerHTML = `
+                    <td>${row["Product Name"] || ""}</td>
+                    <td>${row["Pack"] || ""}</td>
+                    <td>${row["Code"] || ""}</td>
+                    <td>${row["barcode1"] || ""}</td>
+                    <td>${statusIcon}</td>
+                    <td>${onOrderIcon}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            filterTable();
         })
         .catch(err => {
             document.getElementById("stockBody").innerHTML =
                 `<tr><td colspan="6" style="color:red;">Failed to load data: ${err.message}</td></tr>`;
         });
-
-                    data.forEach(row => {
-                        const tr = document.createElement("tr");
-
-                        let statusIcon = "";
-                        if (row["Stock Status"] === "Green") statusIcon = '<span class="status-icon green-circle"></span>';
-                        else if (row["Stock Status"] === "Amber") statusIcon = '<span class="status-icon amber-circle"></span>';
-                        else if (row["Stock Status"] === "Red") statusIcon = '<span class="status-icon red-circle"></span>';
-
-                        const onOrderValue = parseInt(row["On Order"], 10);
-                        let onOrderIcon = (!isNaN(onOrderValue) && onOrderValue > 0) ? "🚚" : "";
-
-                        tr.innerHTML = `
-                            <td>${row["Product Name"] || ""}</td>
-                            <td>${row["Pack"] || ""}</td>
-                            <td>${row["Code"] || ""}</td>
-                            <td>${row["barcode1"] || ""}</td>
-                            <td>${statusIcon}</td>
-                            <td>${onOrderIcon}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-
-                    filterTable();
-                });
-        }
+}
 
         function fetchLastUpdatedDate() {
             fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.json&per_page=1")
