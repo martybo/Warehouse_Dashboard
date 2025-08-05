@@ -120,7 +120,7 @@
       <label for="search">Search:</label>
       <input type="text" id="search" placeholder="Filter products (e.g. levoth/tab/50)" autocomplete="off" />
     </div>
-    <div class="hint">Enter multiple search terms separated by / to narrow results. 🚚 = Incoming delivery.</div>
+    <div class="hint">Enter at least 3 characters. Use / to combine search terms. 🚚 = Incoming delivery.</div>
     <div id="loading">Loading data...</div>
     <table id="stockTable">
       <thead>
@@ -204,6 +204,15 @@
     function filterTable() {
       const input = document.getElementById("search").value.trim().toLowerCase();
       const terms = input.split("/").map(t => t.trim()).filter(Boolean);
+    
+      const tbody = document.getElementById("stockBody");
+    
+      if (input.length < 3) {
+        // Hide all rows until user types at least 3 characters
+        tbody.innerHTML = "";
+        return;
+      }
+    
       const filtered = stockData.filter(row =>
         terms.every(term =>
           Object.values(row).some(val =>
@@ -211,6 +220,7 @@
           )
         )
       );
+    
       renderTable(filtered);
     }
 
