@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warehouse Stock Availability Dashboard</title>
+  <link rel="icon" href="logo.jpg" type="image/jpeg" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f8f9fb;
+      color: #222;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: #003366;
+      color: #fff;
+      padding: 1rem;
+    }
+    header img {
+      height: 60px;
+      margin-right: 18px;
+    }
+    header h1 {
+      font-size: 2rem;
+      margin: 0;
+    }
+    main {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .search-container {
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .search-container label {
+      font-weight: bold;
+    }
+    .search-container input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 320px;
+    }
+    #loading {
+      text-align: center;
+      color: #003366;
+      font-weight: bold;
+      margin: 1rem 0;
+      display: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+    th, td {
+      padding: 0.75rem 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #e3eaf4;
+      cursor: pointer;
+      user-select: none;
+    }
+    tr:hover {
+      background: #f1f7fa;
+    }
+    .hint {
+      color: #555;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+    .updated-date {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.5rem;
+      text-align: right;
+    }
+    .status-icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .green-circle { background-color: #28a745; }
+    .amber-circle { background-color: #ffc107; }
+    .red-circle { background-color: #dc3545; }
+    footer {
+      margin-top: 40px;
+      font-size: 13px;
+      text-align: center;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.jpg" alt="Medicare Pharmacy Group Logo" />
+    <h1>Warehouse Dashboard</h1>
+  </header>
+  <main>
+    <div class="search-container">
+      <label for="search">Search:</label>
+      <input type="text" id="search" placeholder="Filter products (e.g. levoth/tab/50)" autocomplete="off" />
+    </div>
+    <div class="hint">Enter multiple search terms separated by / to narrow results. 🚚 = Incoming delivery.</div>
+    <div id="loading">Loading data...</div>
+    <table id="stockTable">
+      <thead>
+        <tr>
+          <th data-sort="Product Name">Product Name</th>
+          <th data-sort="Code">Code</th>
+          <th data-sort="barcode1">Barcode</th>
+          <th data-sort="Stock Status">Stock Status</th>
+          <th data-sort="On Order">On Order 🚚</th>
+        </tr>
+      </thead>
+      <tbody id="stockBody"></tbody>
+    </table>
+    <div class="updated-date" id="updatedDate"></div>
+  </main>
+  <footer>
+    <hr />
+    Internal use only — © Medicare Pharmacy Group, 2025. All rights reserved.<br />
+    Version 1.1.1 | Deployed: 05-08-2025
+  </footer>
+
+  <script>
+    const DATA_URL = "StockDashboardData.json";
+    let stockData = [];
+    let currentSort = { column: null, ascending: true };
+
+    function fetchData() {
+      document.getElementById("loading").style.display = "block";
+      fetch(DATA_URL)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("loading").style.display = "none";
+          stockData = Array.isArray(data) ? data : (Array.isArray(data.stock) ? data.stock : []);
+          renderTable(stockData);
+          const dates = stockData.map(row => row["Last Updated"]).filter(Boolean);
+          const mostRecent = dates.length ? dates[0] : '';
+          document.getElementById("updatedDate").textContent = mostRecent ? `Last Updated: ${mostRecent}` : '';
+        })
+        .catch(err => {
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("stockBody").innerHTML =
+            `<tr><td colspan="5" style="color:red;">Error: Unable to fetch stock data.</td></tr>`;
+        });
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById("stockBody");
+      tbody.innerHTML = "";
+      const fragment = document.createDocumentFragment();
+      data.forEach(row => {
+        let statusIcon = "";
+        if (row["Stock Status"] === "Green") statusIcon = '<span class="status-icon green-circle"></span>';
+        else if (row["Stock Status"] === "Amber") statusIcon = '<span class="status-icon amber-circle"></span>';
+        else if (row["Stock Status"] === "Red") statusIcon = '<span class="status-icon red-circle"></span>';
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>{sanitize(row["Product Name"])}</td>
+          <td>{sanitize(row["Code"])}</td>
+          <td>{sanitize(row["barcode1"])}</td>
+          <td>${statusIcon}</td>
+          <td>${["1", "true", 1, true].includes(row["On Order"]) ? "🚚" : ""}</td>
+        `;
+        fragment.appendChild(tr);
+      });
+      tbody.appendChild(fragment);
+    }
+
+    function sanitize(text) {
+      return String(text ?? "").replace(/[<>&"'`]/g, c =>
+        ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;','`':'&#96;'})[c]
+      );
+    }
+
+    let debounceTimer;
+    document.getElementById("search").addEventListener("keyup", function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(filterTable, 250);
+    });
+
+    function filterTable() {
+      const input = document.getElementById("search").value.trim().toLowerCase();
+      const terms = input.split("/").map(t => t.trim()).filter(Boolean);
+      const filtered = stockData.filter(row =>
+        terms.every(term =>
+          Object.values(row).some(val =>
+            String(val ?? "").toLowerCase().includes(term)
+          )
+        )
+      );
+      renderTable(filtered);
+    }
+
+    document.querySelectorAll("#stockTable th").forEach(th => {
+      th.addEventListener("click", () => {
+        const col = th.getAttribute("data-sort");
+        sortTable(col);
+      });
+    });
+
+    function sortTable(column) {
+      if (!column) return;
+      currentSort.ascending = currentSort.column === column ? !currentSort.ascending : true;
+      currentSort.column = column;
+      stockData.sort((a, b) => {
+        let valA = a[column], valB = b[column];
+        if (typeof valA === "string") valA = valA.toLowerCase();
+        if (typeof valB === "string") valB = valB.toLowerCase();
+        if (valA < valB) return currentSort.ascending ? -1 : 1;
+        if (valA > valB) return currentSort.ascending ? 1 : -1;
+        return 0;
+      });
+      filterTable();
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>
