@@ -7,7 +7,7 @@ This project is designed to support **read-only, real-time updates** using a pub
 ---
 
 ## 🌟 Features
-- Real-time CSV parsing from GitHub
+- Real-time JSON parsing from GitHub
 - Color-coded stock indicators (Green, Amber, Red)
 - "On Order" icon displayed as 🚚
 - Search by product name, PIP code, or barcode
@@ -30,7 +30,7 @@ _Deployed: 01-08-2025_
 ## 📁 Folder Structure
 .
 ├── index.html # Main dashboard interface
-├── StockDashboardData.csv # Current live stock data
+├── StockDashboardData.json # Current live stock data
 ├── logo.jpg # Business logo displayed at top of page
 └── README.md # Project documentation (this file)
 
@@ -39,7 +39,7 @@ _Deployed: 01-08-2025_
 ## 🛠 How to Update Stock Data
 
 1. Open the GitHub repository
-2. Replace `StockDashboardData.csv` with a newly exported file from your warehouse system
+2. Replace `StockDashboardData.json` with a newly exported file from your warehouse system
 3. Commit the change — the dashboard will reflect the update immediately
 
 ---
