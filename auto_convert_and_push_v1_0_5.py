@@ -52,16 +52,19 @@ merged_df = pd.merge(stock_df, barcode_df, how="left", on="Code")
 
 # Format JSON output
 print("Formatting dashboard output...")
+
+if "On Order" not in merged_df.columns:
+    merged_df["On Order"] = ""
+
 output_df = pd.DataFrame({
     "Product Name": merged_df.get("Product Name", ""),
     "Pack": merged_df.get("Pack", ""),
     "Code": merged_df.get("Code", ""),
     "barcode1": merged_df.get("barcode1", ""),
     "Stock Status": merged_df.get("Stock Status", ""),
-    "On Order": merged_df.get("On Order", "").apply(lambda x: str(x).strip().lower() if pd.notna(x) else ""),
+    "On Order": merged_df["On Order"].fillna("").astype(str).str.strip().str.lower(),
     "Last Updated": date.today().isoformat()
 })
-
 
 # Fully clean up the DataFrame before JSON conversion
 output_df = output_df.replace([pd.NA, pd.NaT, None, float('nan')], "", regex=False)
