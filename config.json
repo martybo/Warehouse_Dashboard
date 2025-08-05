@@ -1,0 +1,7 @@
+{
+  "stock_csv": "Stock Turnover (Supplied).csv",
+  "barcode_txt": "Product Lookup.txt",
+  "output_json": "StockDashboardData.json",
+  "github_repo": "martybo/Warehouse_Dashboard",
+  "target_repo_path": "StockDashboardData.json"
+}
