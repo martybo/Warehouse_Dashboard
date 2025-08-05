@@ -153,7 +153,14 @@
                 })
                 .then(data => {
                     document.getElementById("loading").style.display = "none";
-                    stockData = Array.isArray(data.stock) ? data.stock : [];
+                    // Support both a bare array and an object with a `stock` array
+                    if (Array.isArray(data)) {
+                        stockData = data;
+                    } else if (Array.isArray(data.stock)) {
+                        stockData = data.stock;
+                    } else {
+                        stockData = [];
+                    }
                     renderTable(stockData);
                     document.getElementById("updatedDate").textContent =
                         data.updated ? `Last Updated: ${data.updated}` : '';
