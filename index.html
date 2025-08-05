@@ -77,10 +77,19 @@
 const DATA_URL = "https://raw.githubusercontent.com/martybo/Warehouse_Dashboard/main/StockDashboardData.json";
 
         function loadJSON() {
-            fetch(DATA_URL)
-                .then(res => res.json())
-                .then(data => {
-                    const tbody = document.getElementById("stockBody");
+    fetch(DATA_URL)
+        .then(res => {
+            if (!res.ok) throw new Error("Failed to fetch data");
+            return res.json();
+        })
+        .then(data => {
+            if (!Array.isArray(data)) throw new Error("Data is not an array");
+            // ...populate table
+        })
+        .catch(err => {
+            document.getElementById("stockBody").innerHTML =
+                `<tr><td colspan="6" style="color:red;">Failed to load data: ${err.message}</td></tr>`;
+        });
 
                     data.forEach(row => {
                         const tr = document.createElement("tr");
