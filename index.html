@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Warehouse Stock Availability Dashboard</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -75,15 +74,12 @@
     </footer>
 
     <script>
-        const CSV_URL = "https://raw.githubusercontent.com/martybo/Warehouse_Dashboard/main/StockDashboardData.csv";
+        const DATA_URL = "StockDashboardData.json";
 
-        function loadCSV() {
-            Papa.parse(CSV_URL, {
-                download: true,
-                header: true,
-                transformHeader: h => h.trim(),
-                complete: function(results) {
-                    const data = results.data;
+        function loadJSON() {
+            fetch(DATA_URL)
+                .then(res => res.json())
+                .then(data => {
                     const tbody = document.getElementById("stockBody");
 
                     data.forEach(row => {
@@ -94,7 +90,8 @@
                         else if (row["Stock Status"] === "Amber") statusIcon = '<span class="status-icon amber-circle"></span>';
                         else if (row["Stock Status"] === "Red") statusIcon = '<span class="status-icon red-circle"></span>';
 
-                        let onOrderIcon = (row["On Order"] || "").toString().toLowerCase() === "true" ? "🚚" : "";
+                        const onOrderValue = parseInt(row["On Order"], 10);
+                        let onOrderIcon = (!isNaN(onOrderValue) && onOrderValue > 0) ? "🚚" : "";
 
                         tr.innerHTML = `
                             <td>${row["Product Name"] || ""}</td>
@@ -108,12 +105,11 @@
                     });
 
                     filterTable();
-                }
-            });
+                });
         }
 
         function fetchLastUpdatedDate() {
-            fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.csv&per_page=1")
+            fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.json&per_page=1")
                 .then(res => res.json())
                 .then(data => {
                     if (Array.isArray(data) && data.length > 0) {
@@ -143,7 +139,7 @@
         }
 
         fetchLastUpdatedDate();
-        loadCSV();
+        loadJSON();
     </script>
 </body>
 </html>
