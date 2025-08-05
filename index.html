@@ -100,6 +100,8 @@
         }
     </style>
 </head>
+<!-- ... HEAD + STYLE unchanged ... -->
+
 <body>
     <header>
         <img src="logo.jpg" alt="Medicare Pharmacy Group Logo">
@@ -112,6 +114,7 @@
         </div>
         <div class="hint">Type to filter. Click column headers to sort. 🚚 = Incoming delivery.</div>
         <div id="loading">Loading data...</div>
+
         <table id="stockTable">
             <thead>
                 <tr>
@@ -120,13 +123,20 @@
                     <th data-sort="barcode1">Barcode</th>
                     <th data-sort="Stock Status">Stock Status</th>
                     <th data-sort="On Order">On Order 🚚</th>
-                    <th data-sort="Last Updated">Last Updated</th>
                 </tr>
             </thead>
             <tbody id="stockBody"></tbody>
         </table>
+
         <div class="updated-date" id="updatedDate"></div>
+
+        <footer style="margin-top: 40px; font-size: 0.85rem; color: #555; text-align: center;">
+            <hr>
+            <p>© Medicare Pharmacy Group, 2025 — All rights reserved</p>
+            <p>Version: <strong>1.1.1</strong> | Deployed: <strong>05-08-2025</strong></p>
+        </footer>
     </main>
+
     <script>
         const DATA_URL = "StockDashboardData.json";
         let stockData = [];
@@ -143,6 +153,7 @@
                     document.getElementById("loading").style.display = "none";
                     stockData = Array.isArray(data) ? data : (Array.isArray(data.stock) ? data.stock : []);
                     renderTable(stockData);
+
                     const dates = stockData.map(row => row["Last Updated"]).filter(Boolean);
                     const mostRecent = dates.length ? dates[0] : '';
                     document.getElementById("updatedDate").textContent =
@@ -151,7 +162,7 @@
                 .catch(err => {
                     document.getElementById("loading").style.display = "none";
                     document.getElementById("stockBody").innerHTML =
-                        `<tr><td colspan="6" style="color:red;">Error: Unable to fetch stock data. Please try again later.</td></tr>`;
+                        `<tr><td colspan="5" style="color:red;">Error: Unable to fetch stock data. Please try again later.</td></tr>`;
                 });
         }
 
@@ -159,18 +170,28 @@
             const tbody = document.getElementById("stockBody");
             tbody.innerHTML = "";
             const fragment = document.createDocumentFragment();
+
             data.forEach(row => {
                 const tr = document.createElement("tr");
+
+                let statusCircle = "";
+                switch ((row["Stock Status"] || "").toLowerCase()) {
+                    case "green": statusCircle = '<span style="color:#28a745;">🟢</span>'; break;
+                    case "amber": statusCircle = '<span style="color:#ffc107;">🟠</span>'; break;
+                    case "red":   statusCircle = '<span style="color:#dc3545;">🔴</span>'; break;
+                    default:      statusCircle = ""; break;
+                }
+
                 tr.innerHTML = `
                     <td>${sanitize(row["Product Name"])}</td>
                     <td>${sanitize(row["Code"])}</td>
                     <td>${sanitize(row["barcode1"])}</td>
-                    <td>${sanitize(row["Stock Status"])}</td>
+                    <td>${statusCircle}</td>
                     <td>${row["On Order"] === "1" || row["On Order"] === "true" ? "🚚" : ""}</td>
-                    <td>${sanitize(row["Last Updated"])}</td>
                 `;
                 fragment.appendChild(tr);
             });
+
             tbody.appendChild(fragment);
         }
 
@@ -180,10 +201,9 @@
             );
         }
 
-        let debounceTimer;
-        document.getElementById("search").addEventListener("keyup", function() {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(filterTable, 250);
+        document.getElementById("search").addEventListener("keyup", function () {
+            clearTimeout(window.debounceTimer);
+            window.debounceTimer = setTimeout(filterTable, 250);
         });
 
         function filterTable() {
