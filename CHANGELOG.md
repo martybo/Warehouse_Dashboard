@@ -4,6 +4,10 @@ All notable changes to this project are documented here, using [Semantic Version
 
 ---
 
+## [1.1.1] - 2025-08-05
+### Fixed
+- Corrected broken data source path that prevented stock data from loading and search results from appearing.
+
 ### v1.0.0 (Public Release)
 - First production release
 - Includes:
