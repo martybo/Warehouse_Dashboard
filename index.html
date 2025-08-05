@@ -102,6 +102,12 @@
       text-align: center;
       color: #555;
     }
+    .left-align {
+      text-align: left;
+    }
+    .center-align {
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -119,11 +125,11 @@
     <table id="stockTable">
       <thead>
         <tr>
-          <th data-sort="Product Name">Product Name</th>
-          <th data-sort="Code">PIPCode</th>
-          <th data-sort="barcode1">Barcode</th>
-          <th data-sort="Stock Status">Stock Status</th>
-          <th data-sort="On Order">On Order 🚚</th>
+          <th class="left-align" data-sort="Product Name">Product Name</th>
+          <th class="left-align" data-sort="Code">PIPCode</th>
+          <th class="left-align" data-sort="barcode1">Barcode</th>
+          <th class="center-align" data-sort="Stock Status">Stock Status</th>
+          <th class="center-align" data-sort="On Order">On Order 🚚</th>
         </tr>
       </thead>
       <tbody id="stockBody"></tbody>
@@ -172,11 +178,11 @@
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${sanitize(row["Product Name"])}</td>
-          <td>${sanitize(row["Code"])}</td>
-          <td>${sanitize(row["barcode1"])}</td>
-          <td>${statusIcon}</td>
-          <td>${["1", "true", 1, true].includes(row["On Order"]) ? "🚚" : ""}</td>
+          <td class="left-align">${sanitize(row["Product Name"])}</td>
+          <td class="left-align">${sanitize(row["Code"])}</td>
+          <td class="left-align">${sanitize(row["barcode1"])}</td>
+          <td class="center-align">${statusIcon}</td>
+          <td class="center-align">${["1", "true"].includes(String(row["On Order"]).toLowerCase()) ? "🚚" : ""}</td>
         `;
         fragment.appendChild(tr);
       });
