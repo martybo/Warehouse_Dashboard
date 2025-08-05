@@ -1,160 +1,262 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Warehouse Stock Availability Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Dashboard</title>
+    <link rel="icon" href="logo.jpg" type="image/jpeg">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header img { height: 60px; }
-        .updated-date { font-size: 14px; color: #666; }
-        table { border-collapse: collapse; width: 100%; background: white; margin-top: 15px; }
-        th, td { padding: 10px 12px; border: 1px solid #ccc; text-align: left; }
-        th { background-color: #f0f0f0; }
-        .status-icon {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            margin-right: 6px;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f8f9fb;
+            color: #222;
         }
-        .green-circle { background-color: #28a745; }
-        .amber-circle { background-color: #ffc107; }
-        .red-circle { background-color: #dc3545; }
-        input[type="text"] {
-            padding: 10px;
-            width: 100%;
-            margin-bottom: 15px;
-            font-size: 16px;
+        header {
+            display: flex;
+            align-items: center;
+            background: #003366;
+            color: #fff;
+            padding: 1rem;
+        }
+        header img {
+            height: 60px;
+            margin-right: 18px;
+        }
+        header h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+        main {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .search-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .search-container label {
+            font-weight: bold;
+        }
+        .search-container input {
+            padding: 0.5rem;
+            font-size: 1rem;
             border-radius: 4px;
             border: 1px solid #ccc;
+            width: 220px;
+        }
+        #loading {
+            text-align: center;
+            color: #003366;
+            font-weight: bold;
+            margin: 1rem 0;
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+        th, td {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #e3eaf4;
+            cursor: pointer;
+            user-select: none;
+        }
+        tr:hover {
+            background: #f1f7fa;
         }
         .hint {
-            font-size: 14px;
-            color: #777;
-            margin-top: -10px;
-            margin-bottom: 15px;
-        }
-        footer {
-            margin-top: 40px;
-            font-size: 13px;
-            text-align: center;
             color: #555;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
         }
-        hr { margin: 30px 0; }
+        .updated-date {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+        .download-btn {
+            margin-left: auto;
+            padding: 0.5rem 1rem;
+            background: #003366;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        @media (max-width: 700px) {
+            main {
+                padding: 0.5rem;
+            }
+            th, td {
+                font-size: 0.95rem;
+                padding: 0.45rem 0.25rem;
+            }
+            header img {
+                height: 40px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <img src="logo.jpg" alt="MediCare Logo">
-        <div class="updated-date" id="updatedDate">Last updated: --</div>
-    </div>
-
-    <h2>Warehouse Stock Availability Dashboard</h2>
-    <input type="text" id="search" placeholder="Search by Product Name, Code or Barcode" onkeyup="filterTable()" />
-    <div class="hint">Enter at least 3 characters. Use / to combine search terms (e.g. levoth/tab/50)</div>
-
-    <table id="stockTable">
-        <thead>
-            <tr>
-                <th>Product Name</th>
-                <th>Pack</th>
-                <th>Code</th>
-                <th>Barcode</th>
-                <th>Status</th>
-                <th>On Order</th>
-            </tr>
-        </thead>
-        <tbody id="stockBody"></tbody>
-    </table>
-
-    <footer>
-        <hr>
-        <div>Internal use only — © Medicare Pharmacy Group, 2025. All rights reserved. | Version 1.1.0 | Deployed: 04-08-2025</div>
-    </footer>
-
+    <header>
+        <img src="logo.jpg" alt="Medicare Pharmacy Group Logo">
+        <h1>Warehouse Dashboard</h1>
+    </header>
+    <main>
+        <div class="search-container">
+            <label for="search">Search:</label>
+            <input type="text" id="search" placeholder="Filter products..." autocomplete="off">
+            <button class="download-btn" onclick="downloadCSV()">Download CSV</button>
+        </div>
+        <div class="hint">Type to filter. Click column headers to sort. 🚚 = Incoming delivery.</div>
+        <div id="loading">Loading data...</div>
+        <table id="stockTable">
+            <thead>
+                <tr>
+                    <th data-sort="Product Name">Product Name</th>
+                    <th data-sort="Product Code">Product Code</th>
+                    <th data-sort="Warehouse">Warehouse</th>
+                    <th data-sort="Current Stock">Current Stock</th>
+                    <th data-sort="Low Stock Threshold">Low Stock Threshold</th>
+                    <th data-sort="Incoming Delivery">Incoming Delivery 🚚</th>
+                </tr>
+            </thead>
+            <tbody id="stockBody">
+                <!-- Data rows inserted by script -->
+            </tbody>
+        </table>
+        <div class="updated-date" id="updatedDate"></div>
+    </main>
     <script>
-const DATA_URL = "https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.json&per_page=1&sha=JSON-Semi-Auto-Update";
+        const DATA_URL = "StockDashboardData.json";
+        let stockData = [];
+        let currentSort = { column: null, ascending: true };
 
-function loadJSON() {
-    fetch(DATA_URL)
-        .then(res => {
-            if (!res.ok) throw new Error("Failed to fetch data");
-            return res.json();
-        })
-        .then(data => {
-            if (!Array.isArray(data)) throw new Error("Data is not an array");
-
-            const tbody = document.getElementById("stockBody");
-            tbody.innerHTML = ""; // Clear previous table contents
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6">No stock data available.</td></tr>`;
-                return;
-            }
-
-            data.forEach(row => {
-                const tr = document.createElement("tr");
-
-                let statusIcon = "";
-                if (row["Stock Status"] === "Green") statusIcon = '<span class="status-icon green-circle"></span>';
-                else if (row["Stock Status"] === "Amber") statusIcon = '<span class="status-icon amber-circle"></span>';
-                else if (row["Stock Status"] === "Red") statusIcon = '<span class="status-icon red-circle"></span>';
-
-                const onOrderValue = parseInt(row["On Order"], 10);
-                let onOrderIcon = (!isNaN(onOrderValue) && onOrderValue > 0) ? "🚚" : "";
-
-                tr.innerHTML = `
-                    <td>${row["Product Name"] || ""}</td>
-                    <td>${row["Pack"] || ""}</td>
-                    <td>${row["Code"] || ""}</td>
-                    <td>${row["barcode1"] || ""}</td>
-                    <td>${statusIcon}</td>
-                    <td>${onOrderIcon}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            filterTable();
-        })
-        .catch(err => {
-            document.getElementById("stockBody").innerHTML =
-                `<tr><td colspan="6" style="color:red;">Failed to load data: ${err.message}</td></tr>`;
-        });
-}
-
-        function fetchLastUpdatedDate() {
-            fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.json&per_page=1&sha=JSON-Semi-Auto-Update")
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data) && data.length > 0) {
-                        const date = new Date(data[0].commit.committer.date);
-                        document.getElementById("updatedDate").textContent =
-                            "Last updated: " + date.toLocaleDateString("en-GB");
-                    } else {
-                        throw new Error("No commit data returned");
-                    }
+        function fetchData() {
+            document.getElementById("loading").style.display = "block";
+            fetch(DATA_URL)
+                .then(res => {
+                    if (!res.ok) throw new Error("Network response was not ok");
+                    return res.json();
                 })
-                .catch(() => {
-                    document.getElementById("updatedDate").textContent = "Last updated: unknown";
+                .then(data => {
+                    document.getElementById("loading").style.display = "none";
+                    stockData = Array.isArray(data.stock) ? data.stock : [];
+                    renderTable(stockData);
+                    document.getElementById("updatedDate").textContent =
+                        data.updated ? `Last Updated: ${data.updated}` : '';
+                })
+                .catch(err => {
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("stockBody").innerHTML =
+                        `<tr><td colspan="6" style="color:red;">Error: Unable to fetch stock data. Please try again later.</td></tr>`;
                 });
         }
 
-        function filterTable() {
-            const input = document.getElementById("search");
-            const filter = input.value.trim().toLowerCase();
-            const segments = filter.split("/").map(s => s.trim()).filter(Boolean);
-            const trs = document.querySelectorAll("#stockTable tbody tr");
-
-            trs.forEach(tr => {
-                const text = tr.textContent.toLowerCase();
-                const match = segments.length >= 1 && segments.every(seg => text.includes(seg));
-                tr.style.display = (filter.length >= 3 && match) ? "" : "none";
+        function renderTable(data) {
+            const tbody = document.getElementById("stockBody");
+            tbody.innerHTML = "";
+            const fragment = document.createDocumentFragment();
+            data.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${sanitize(row["Product Name"])}</td>
+                    <td>${sanitize(row["Product Code"])}</td>
+                    <td>${sanitize(row["Warehouse"])}</td>
+                    <td>${sanitize(row["Current Stock"])}</td>
+                    <td>${sanitize(row["Low Stock Threshold"])}</td>
+                    <td>${row["Incoming Delivery"] ? "🚚" : ""}</td>
+                `;
+                fragment.appendChild(tr);
             });
+            tbody.appendChild(fragment);
         }
 
-        fetchLastUpdatedDate();
-        loadJSON();
+        function sanitize(text) {
+            return String(text).replace(/[<>&"'`]/g, c =>
+                ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;','`':'&#96;'})[c]
+            );
+        }
+
+        let debounceTimer;
+        document.getElementById("search").addEventListener("keyup", function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(filterTable, 250);
+        });
+
+        function filterTable() {
+            const query = document.getElementById("search").value.trim().toLowerCase();
+            const filtered = stockData.filter(row =>
+                Object.values(row).some(val =>
+                    String(val).toLowerCase().includes(query)
+                )
+            );
+            renderTable(filtered);
+        }
+
+        // Table sorting
+        document.querySelectorAll("#stockTable th").forEach(th => {
+            th.addEventListener("click", () => {
+                const col = th.getAttribute("data-sort");
+                sortTable(col);
+            });
+        });
+
+        function sortTable(column) {
+            if (!column) return;
+            currentSort.ascending = currentSort.column === column ? !currentSort.ascending : true;
+            currentSort.column = column;
+            stockData.sort((a, b) => {
+                let valA = a[column], valB = b[column];
+                if (typeof valA === "string") valA = valA.toLowerCase();
+                if (typeof valB === "string") valB = valB.toLowerCase();
+                if (valA < valB) return currentSort.ascending ? -1 : 1;
+                if (valA > valB) return currentSort.ascending ? 1 : -1;
+                return 0;
+            });
+            filterTable(); // Rerender with sorting and filter applied
+        }
+
+        // Download CSV
+        function downloadCSV() {
+            const rows = [["Product Name","Product Code","Warehouse","Current Stock","Low Stock Threshold","Incoming Delivery"]];
+            const query = document.getElementById("search").value.trim().toLowerCase();
+            const data = stockData.filter(row =>
+                Object.values(row).some(val => String(val).toLowerCase().includes(query))
+            );
+            data.forEach(row => {
+                rows.push([
+                    row["Product Name"],
+                    row["Product Code"],
+                    row["Warehouse"],
+                    row["Current Stock"],
+                    row["Low Stock Threshold"],
+                    row["Incoming Delivery"] ? "Yes" : ""
+                ]);
+            });
+            const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\r\n");
+            const blob = new Blob([csv], {type:"text/csv"});
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "warehouse_stock.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        fetchData();
     </script>
 </body>
 </html>
