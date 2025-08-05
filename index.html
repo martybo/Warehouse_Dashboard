@@ -172,9 +172,9 @@
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>{sanitize(row["Product Name"])}</td>
-          <td>{sanitize(row["Code"])}</td>
-          <td>{sanitize(row["barcode1"])}</td>
+          <td>${sanitize(row["Product Name"])}</td>
+          <td>${sanitize(row["Code"])}</td>
+          <td>${sanitize(row["barcode1"])}</td>
           <td>${statusIcon}</td>
           <td>${["1", "true", 1, true].includes(row["On Order"]) ? "🚚" : ""}</td>
         `;
