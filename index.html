@@ -74,7 +74,7 @@
     </footer>
 
     <script>
-const DATA_URL = "https://raw.githubusercontent.com/martybo/Warehouse_Dashboard/main/StockDashboardData.json";
+const DATA_URL = "https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.json&per_page=1&sha=JSON-Semi-Auto-Update";
 
 function loadJSON() {
     fetch(DATA_URL)
@@ -124,7 +124,7 @@ function loadJSON() {
 }
 
         function fetchLastUpdatedDate() {
-            fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.json&per_page=1")
+            fetch("https://api.github.com/repos/martybo/Warehouse_Dashboard/commits?path=StockDashboardData.json&per_page=1&sha=JSON-Semi-Auto-Update")
                 .then(res => res.json())
                 .then(data => {
                     if (Array.isArray(data) && data.length > 0) {
