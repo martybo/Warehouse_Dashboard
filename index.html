@@ -154,10 +154,12 @@
         .then(data => {
           document.getElementById("loading").style.display = "none";
           stockData = Array.isArray(data) ? data : (Array.isArray(data.stock) ? data.stock : []);
-          renderTable(stockData);
+    
+          // Just store the data. Don’t render it yet.
           const dates = stockData.map(row => row["Last Updated"]).filter(Boolean);
           const mostRecent = dates.length ? dates[0] : '';
-          document.getElementById("updatedDate").textContent = mostRecent ? `Last Updated: ${mostRecent}` : '';
+          document.getElementById("updatedDate").textContent =
+            mostRecent ? `Last Updated: ${mostRecent}` : '';
         })
         .catch(err => {
           document.getElementById("loading").style.display = "none";
@@ -204,12 +206,11 @@
     function filterTable() {
       const input = document.getElementById("search").value.trim().toLowerCase();
       const terms = input.split("/").map(t => t.trim()).filter(Boolean);
-    
       const tbody = document.getElementById("stockBody");
     
       if (input.length < 3) {
         // Hide all rows until user types at least 3 characters
-        tbody.innerHTML = "";
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Enter at least 3 characters to view results.</td></tr>`;
         return;
       }
     
