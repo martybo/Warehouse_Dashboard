@@ -7,14 +7,52 @@ All notable changes to this project are documented here, using [Semantic Version
 ## [1.1.1] - 2025-08-05
 ### Fixed
 - Corrected broken data source path that prevented stock data from loading and search results from appearing.
+- Repaired missing `"On Order"` logic — now detects non-zero values accurately and displays 🚚.
+- Sanitized field data and ensured robust null handling.
 
-### v1.0.0 (Public Release)
-- First production release
-- Includes:
-  - Delivery van emoji for "On Order"
-  - Refined search with row hiding until 3+ characters
-  - Last updated & deployed date display
-  - Responsive layout and barcode display improvements
+### Added
+- Left-justified text alignment for key columns (`Product Name`, `PIPCode`, `Barcode`)
+- Centered alignment for icon columns (`Stock Status`, `On Order`)
+- Multi-segment search using `/` separators (e.g. `levoth/tab/100`)
+- “Last Updated” date based on JSON content, not GitHub API
+
+---
+
+## [1.1.0] - 2025-08-04
+### Changed
+- Switched from CSV to JSON data source for improved integrity and compatibility.
+- Removed download CSV button temporarily.
+- Updated UI layout: cleaner table design, flexible styling.
+
+### Added
+- "On Order" logic in UI (initial implementation)
+- Column sorting on all headers
+- Version and copyright footer
+
+---
+
+## [1.0.1] - 2025-08-02
+### Fixed
+- Adjusted GitHub fetch logic to display correct "Last Updated" timestamp
+- Improved JSON escaping to avoid display issues in product names
+
+### Added
+- Initial JSON build script (`auto_convert_and_push.py`)
+- Support for direct GitHub API commit via GitHub token
+- Basic `.env` support for local development security
+
+---
+
+## [1.0.0] - 2025-08-01
+### Public Release
+- First stable production release
+
+### Features
+- Responsive layout for desktop/tablet
+- Live CSV parsing using PapaParse
+- Color-coded stock status (green/amber/red)
+- Search with filter logic and emoji 🚚 indicator
+- Last updated & deployed timestamp
 
 ---
 
