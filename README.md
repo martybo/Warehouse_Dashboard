@@ -1,65 +1,75 @@
 # Warehouse Stock Availability Dashboard
 
-A lightweight, browser-based stock status viewer for pharmacy store teams.
+A lightweight, browser-based stock status viewer for pharmacy teams.
 
-This project is designed to support **read-only, real-time updates** using a public GitHub-hosted `.csv` file, making it ideal for SharePoint embedding, kiosk use, or desktop reference.
+This tool supports **read-only, real-time updates** using a public GitHub-hosted `.json` file, ideal for SharePoint embedding, kiosk use, or local web access via browser.
 
 ---
 
-## 🌟 Features
-- Real-time JSON parsing from GitHub
-- Color-coded stock indicators (Green, Amber, Red)
-- "On Order" icon displayed as 🚚
-- Search by product name, PIP code, or barcode
-- Mobile and desktop friendly
-- Auto-updating date + semantic versioning
+## 🌟 Features (v1.1.1)
+- ✅ Real-time JSON parsing from GitHub
+- ✅ Color-coded stock indicators (Green, Amber, Red)
+- ✅ "On Order" detection with 🚚 icon
+- ✅ Multi-field search using `/` separator (e.g., `amox/tab/500`)
+- ✅ Sortable columns (Product, PIP Code, Barcode, etc.)
+- ✅ Responsive design (mobile and desktop)
+- ✅ Intelligent filtering (results hidden until 3+ characters entered)
+- ✅ Auto-updating “Last Updated” date from file contents
+- ✅ Deployment-ready for SharePoint, intranet, or kiosk use
 
 ---
 
 ## 🚀 Live Demo
-[View the Dashboard](https://martybo.github.io/Warehouse_Dashboard/)
+[🔗 View the Dashboard](https://martybo.github.io/Warehouse_Dashboard/)
 
 ---
 
 ## 📦 Version
-**v1.0.0** — Initial public release  
-_Deployed: 01-08-2025_
+**v1.1.1** — Improved filtering, formatting, and On Order detection  
+_Deployed: 05-08-2025_
 
 ---
 
 ## 📁 Folder Structure
-.
-├── index.html # Main dashboard interface
-├── StockDashboardData.json # Current live stock data
-├── logo.jpg # Business logo displayed at top of page
+├── index.html # Main dashboard interface (UI logic + styles)
+├── StockDashboardData.json # Live warehouse stock data
+├── logo.jpg # Business logo shown at top of page
 └── README.md # Project documentation (this file)
 
----
-
-## 🛠 How to Update Stock Data
-
-1. Open the GitHub repository
-2. Replace `StockDashboardData.json` with a newly exported file from your warehouse system
-3. Commit the change — the dashboard will reflect the update immediately
 
 ---
 
-## 📦 Requirements
+## 🔄 How to Update Stock Data
 
-- A web browser (desktop or tablet)
-- Optional: SharePoint page with iframe/embed support
+This dashboard reads directly from the `StockDashboardData.json` file hosted on GitHub.
+
+To update:
+
+1. Run the `auto_convert_and_push.py` script to regenerate the JSON from `.csv` and `.txt` inputs
+2. Automatically commits the new JSON to GitHub
+3. The dashboard reflects updates instantly upon page load
+
+_The script can be run on Mac or Windows using a local Python environment or GUI launcher._
 
 ---
 
-## 🚀 Deploying to GitHub Pages
+## 🛠 Requirements
 
-1. In your GitHub repo, go to **Settings → Pages**
-2. Choose the branch (`main`) and folder (`/root`) to publish from
-3. Save — GitHub will provide a live public link (e.g., `https://yourname.github.io/Warehouse_Dashboard/`)
+- A modern web browser (Chrome, Edge, Safari, Firefox)
+- Optional: SharePoint or internal intranet support for iframe/web embedding
 
 ---
 
-## 📄 License
+## 🧰 Deploying to GitHub Pages
 
-Internal use only — © Medicare Pharmacy Group, 2025. All rights reserved.
+1. Go to **Settings → Pages** in your GitHub repository
+2. Set:
+   - **Branch**: `main`
+   - **Folder**: `/ (root)`
+3. Save to generate a live site URL
 
+---
+
+## 🛡 License
+
+**Internal use only** — © Medicare Pharmacy Group, 2025. All rights reserved.
