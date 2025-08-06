@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Warehouse Stock Availability Dashboard</title>
   <link rel="icon" href="logo.jpg" type="image/jpeg" />
-  <style>
+<style>
   body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -25,19 +25,22 @@
     padding: 0 1rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: center;
     flex-wrap: wrap;
+    gap: 1rem;
+    text-align: center;
   }
 
   .header-container img {
-    height: 60px;
-    flex-shrink: 0;
+    height: 50px;
+    max-width: 100%;
+    object-fit: contain;
   }
 
   .header-container h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     margin: 0;
-    flex-grow: 1;
+    flex: 1;
   }
 
   main {
@@ -143,23 +146,21 @@
     .header-container {
       flex-direction: column;
       align-items: center;
-      text-align: center;
-    }
-
-    .header-container img {
-      height: 48px;
-      margin-bottom: 0.5rem;
     }
 
     .header-container h1 {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
+    }
+
+    .header-container img {
+      height: 40px;
     }
   }
 </style>
 </head>
 <body>
   <header>
-    <div class="container">
+    <div class="header-container">
       <img src="logo.jpg" alt="Medicare Pharmacy Group Logo" />
       <h1>Warehouse Stock Availability Dashboard</h1>
     </div>
