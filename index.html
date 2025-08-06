@@ -6,114 +6,163 @@
   <title>Warehouse Stock Availability Dashboard</title>
   <link rel="icon" href="logo.jpg" type="image/jpeg" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f8f9fb;
-      color: #222;
-    }
-    header {
-      display: flex;
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f8f9fb;
+    color: #222;
+  }
+
+  header {
+    background: #003366;
+    color: #fff;
+    padding: 1rem 0;
+  }
+
+  .header-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .header-container img {
+    height: 60px;
+    flex-shrink: 0;
+  }
+
+  .header-container h1 {
+    font-size: 2rem;
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  main {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .search-container {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .search-container label {
+    font-weight: bold;
+  }
+
+  .search-container input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 320px;
+    max-width: 100%;
+  }
+
+  #loading {
+    text-align: center;
+    color: #003366;
+    font-weight: bold;
+    margin: 1rem 0;
+    display: none;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+  }
+
+  th, td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  th {
+    background: #e3eaf4;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  tr:hover {
+    background: #f1f7fa;
+  }
+
+  .hint {
+    color: #555;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  .updated-date {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+    text-align: right;
+  }
+
+  .status-icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+
+  .green-circle { background-color: #28a745; }
+  .amber-circle { background-color: #ffc107; }
+  .red-circle { background-color: #dc3545; }
+
+  footer {
+    margin-top: 40px;
+    font-size: 13px;
+    text-align: center;
+    color: #555;
+  }
+
+  .left-align {
+    text-align: left;
+  }
+
+  .center-align {
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .header-container {
+      flex-direction: column;
       align-items: center;
-      background: #003366;
-      color: #fff;
-      padding: 1rem;
-    }
-    header img {
-      height: 60px;
-      margin-right: 18px;
-    }
-    header h1 {
-      font-size: 2rem;
-      margin: 0;
-    }
-    main {
-      max-width: 1100px;
-      margin: 2rem auto;
-      padding: 1rem;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    }
-    .search-container {
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .search-container label {
-      font-weight: bold;
-    }
-    .search-container input {
-      padding: 0.5rem;
-      font-size: 1rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      width: 320px;
-    }
-    #loading {
-      text-align: center;
-      color: #003366;
-      font-weight: bold;
-      margin: 1rem 0;
-      display: none;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 0.5rem;
-    }
-    th, td {
-      padding: 0.75rem 0.5rem;
-      border-bottom: 1px solid #eee;
-    }
-    th {
-      background: #e3eaf4;
-      cursor: pointer;
-      user-select: none;
-    }
-    tr:hover {
-      background: #f1f7fa;
-    }
-    .hint {
-      color: #555;
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-    }
-    .updated-date {
-      font-size: 0.9rem;
-      color: #666;
-      margin-top: 0.5rem;
-      text-align: right;
-    }
-    .status-icon {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      margin-right: 6px;
-    }
-    .green-circle { background-color: #28a745; }
-    .amber-circle { background-color: #ffc107; }
-    .red-circle { background-color: #dc3545; }
-    footer {
-      margin-top: 40px;
-      font-size: 13px;
-      text-align: center;
-      color: #555;
-    }
-    .left-align {
-      text-align: left;
-    }
-    .center-align {
       text-align: center;
     }
-  </style>
+
+    .header-container img {
+      height: 48px;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-container h1 {
+      font-size: 1.6rem;
+    }
+  }
+</style>
 </head>
 <body>
   <header>
-    <img src="logo.jpg" alt="Medicare Pharmacy Group Logo" />
-    <h1>Warehouse Stock Availability Dashboard</h1>
+    <div class="container">
+      <img src="logo.jpg" alt="Medicare Pharmacy Group Logo" />
+      <h1>Warehouse Stock Availability Dashboard</h1>
+    </div>
   </header>
   <main>
     <div class="search-container">
